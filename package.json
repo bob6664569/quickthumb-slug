@@ -31,6 +31,7 @@
     "resize"
   ],
   "dependencies": {
+    "debug": "^4.0.1",
     "imagemagick": "git://github.com/rsms/node-imagemagick.git",
     "mkdirp": "~0.3.3"
   },
