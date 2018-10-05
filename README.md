@@ -15,7 +15,7 @@ app.use('/public', qt.static(__dirname + '/../public'));
 ```
 
 ```html
-<img src="/public/images/red.gif?dim=200x100" />
+<img src="/public/images/red-small.gif" />
 ```
 
 ## Install
