@@ -1,13 +1,13 @@
 {
   "name": "quickthumb-slugs",
-  "version": "0.1",
+  "version": "0.1.1",
   "description": "On the fly, thumbnail creation middleware for express (updated - with restrictions)",
   "author": "Zach Ivester <zivester@gmail.com>",
   "contributors": [
     {
-      "name" : "Johan Massin",
-      "email" : "johan@trilogik.net",
-      "url" : "https://trilogik.net/"
+      "name": "Johan Massin",
+      "email": "johan@trilogik.net",
+      "url": "https://trilogik.net/"
     }
   ],
   "main": "index.js",
@@ -22,12 +22,7 @@
   "bugs": {
     "url": "https://github.com/bob6664569/node-quickthumb/issues"
   },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "http://github.com/bob6664569/node-quickthumb/raw/master/LICENSE"
-    }
-  ],
+  "license": "MIT",
   "keywords": [
     "thumb",
     "thumbnail",

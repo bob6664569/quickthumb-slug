@@ -1,1 +1,1 @@
-module.exports = require('./lib/quickthumb');
+module.exports = require("./lib/quickthumb");

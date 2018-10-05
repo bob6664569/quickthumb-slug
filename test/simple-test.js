@@ -1,11 +1,11 @@
-var assert = require('assert'),
-    fs = require('fs'),
-    path = require('path'),
-    im = require('imagemagick'),
-    qt = require('../');
+var assert = require("assert"),
+    fs = require("fs"),
+    path = require("path"),
+    im = require("imagemagick"),
+    qt = require("../");
 
-var ppath = path.normalize(__dirname + '/../public/images'),
-    src = path.join(ppath, 'cape cod.jpg');
+var ppath = path.normalize(__dirname + "/../public/images"),
+    src = path.join(ppath, "cape cod.jpg");
 
 var sizes = [
     { width: 100, height: 100},
@@ -15,7 +15,7 @@ var sizes = [
 sizes.forEach(function(options){
     var opt = {
         src : src,
-        dst : path.join(ppath, 'red_' + options.width + 'x' + options.height + '.gif'),
+        dst : path.join(ppath, "red_" + options.width + "x" + options.height + ".gif"),
         width : options.width,
         height : options.height,
         quality : 1,
