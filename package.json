@@ -1,5 +1,5 @@
 {
-  "name": "quickthumb-slugs",
+  "name": "quickthumb-slug",
   "version": "0.1.1",
   "description": "On the fly, thumbnail creation middleware for express (updated - with restrictions)",
   "author": "Zach Ivester <zivester@gmail.com>",
@@ -17,10 +17,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/bob6664569/node-quickthumb.git"
+    "url": "https://github.com/bob6664569/quickthumb-slug.git"
   },
   "bugs": {
-    "url": "https://github.com/bob6664569/node-quickthumb/issues"
+    "url": "https://github.com/bob6664569/quickthumb-slug/issues"
   },
   "license": "MIT",
   "keywords": [
