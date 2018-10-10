@@ -1,7 +1,8 @@
 # QuickThumb-Slug
 
-QuickThumb-Slug is an on the fly, thumbnail creation middleware for express based on the [QuickThumb lib](https://github.com/zivester/node-quickthumb) but using pre-defined size formats to avoid malicious exploitation of the library.
-It utilizes the popular *nix image library, ImageMagick.  It allows for the automatic creation of thumbnails by adding query parameters onto a standard image url.  It's ideal for web developers who would like to easily experiment with different size thumbnails, wihout having to worry about pre-generating an entire library.
+QuickThumb-Slug is an on the fly, thumbnail creation middleware for express based on the [QuickThumb lib](https://github.com/zivester/node-quickthumb) but using pre-defined sizes to avoid malicious exploitation of the library.
+It utilizes the popular *nix image library, ImageMagick. It allows for the automatic creation of thumbnails by adding a final slug to image filenames.
+It's ideal for web developers who would like to easily experiment with different size thumbnails, wihout having to worry about pre-generating an entire library.
 
 ## Examples
 
