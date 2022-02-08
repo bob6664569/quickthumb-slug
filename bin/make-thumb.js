@@ -1,9 +1,10 @@
-var fs = require("fs"),
-    path = require("path"),
-    qt = require("../");
+const fs = require("fs");
+const debug = require('debug')('quickthumb-slug');
+const path = require("path");
+const qt = require("../");
 
 function exit(msg){
-    console.log(msg);
+    debug.log(msg);
     process.exit();
 }
 
@@ -50,7 +51,7 @@ if (options.indexOf("--resize") != -1){
     }
 })();
 
-console.log("Converting to " + width + " x " + height);
+debug.log("Converting to " + width + " x " + height);
 
 
 if (!fs.existsSync(src)){
@@ -68,7 +69,7 @@ function convert(src, dst){
         if (err){
             return console.error(err);
         }
-        console.log("CREATED", image);
+        debug.log("CREATED", image);
     });
 }
 

@@ -12,7 +12,7 @@ var express = require('express'),
     qt = require('quickthumb-slug');
 
 app.use(qt.static({
-    dirname: __dirname + "/public",
+    baseDir: __dirname + "/public",
     sizes: {
         square: { width: 400, height: 400, type: "crop" },
         landscape: { width: 1200, height: 600, type: "crop" },
@@ -47,21 +47,20 @@ Fedora/CentOS
 
 ## Usage
 
-### qt.static(path, options)
+### qt.static(options)
 
 Middleware to replace `express.static()` or `connect.static()`.
 
-`path` is the base directory where images are located.
-
 `options` is an object to specify customizations. It currently has the following options:
 
+* `baseDir` is the original directory where source images are located.
+* `cacheDir` The directory where generated images will be created.  If not supplied, images will be created in `[baseDir]/.cache/`
 * `sizes` Object containing configurations for image outputs, **properties are the slugs that will be used in filenames**
     * `width` Width of resized image
     * `height` Height of resized image
     * `type` The type of imagemagick conversion to take place.  There are currently only two options:
-      * `crop` (default) Crops and zooms images to the exact size specified. Proxy to *imagemagick.crop*.
-      * `resize` Resizes an image to fit within the specified dimensions, but actual dimensions may not be exactly as specified. Proxy to *imagemagick.resize*.
-* `cacheDir` The directory where generated images will be created.  If not supplied, images will be created in `[path]/.cache/`
+        * `crop` (default) Crops and zooms images to the exact size specified. Proxy to *imagemagick.crop*.
+        * `resize` Resizes an image to fit within the specified dimensions, but actual dimensions may not be exactly as specified. Proxy to *imagemagick.resize*.
 * `quality` The quality to use when resizing the image.  Values should be between 0 (worst quality) and 1 (best quality)
 
 Resizing of images is directed by the image name.  This is in the format `[filename-without-ext]-[slug][original-ext]`. E.g. `red-square.gif`
