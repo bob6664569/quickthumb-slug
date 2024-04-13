@@ -7,12 +7,13 @@ It's ideal for web developers who would like to easily experiment with different
 ## Examples
 
 ```js
-var express = require('express'),
-    app = express(),
-    qt = require('quickthumb-slug');
+import express from 'express';
+import quickThumbs from 'quickthumb-slug';
 
-app.use(qt.static({
-    baseDir: __dirname + "/public",
+const app = express();
+
+app.use(quickThumbs.static({
+    baseDir: process.cwd() + "/public",
     sizes: {
         square: { width: 400, height: 400, type: "crop" },
         landscape: { width: 1200, height: 600, type: "crop" },
@@ -23,7 +24,7 @@ app.use(qt.static({
 ```
 
 ```html
-<img src="/public/images/red-square.gif" />
+<img src="/images/red-square.gif" />
 ```
 
 ## Install
