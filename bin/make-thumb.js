@@ -1,93 +1,91 @@
-const fs = require("fs");
-const debug = require('debug')('quickthumb-slug');
-const path = require("path");
-const qt = require("../");
+#!/usr/bin/env node
+import { promises as fs } from 'fs';
+import debug from 'debug';
+import path from 'path';
+import quickthumb from '../index.js';
 
-function exit(msg){
-    debug.log(msg);
-    process.exit();
+const log = debug('quickthumb-slug');
+
+function exit(msg) {
+    console.error(msg);
+    process.exit(1);
 }
 
-if (process.argv.length < 5){
-    exit("Usage: make-thumb.js src dst (<width>x<height>|<width>|x<height>) [-r] [-p] [--resize]");
-}
+async function main() {
+    if (process.argv.length < 5) {
+        exit("Usage: make-thumb.js src dst (<width>x<height>|<width>|x<height>) [-r] [-p] [--resize]");
+    }
 
-var args = process.argv.slice(2),
-    dimensions = args[2],
-    src = args[0],
-    dst = args[1],
-    options = args.slice(3),
-    recursive = false,
-    width = "",
-    height = "",
-    type = "crop";
+    const [,, src, dst, dimensions, ...options] = process.argv;
+    const createDimensionDir = options.includes("-p");
+    const recursive = options.includes("-r");
+    const type = options.includes("--resize") ? "resize" : "crop";
 
-// Create dimension directories
-// e.g. 200x150, 200, etc
-if (options.indexOf("-p") != -1){
-    dst = path.join(dst, dimensions);
-}
-
-// Recursive
-if (options.indexOf("-r") != -1){
-    recursive = true;
-}
-
-// Resize
-if (options.indexOf("--resize") != -1){
-    type = "resize";
-}
-
-(function(){
-    var match = /(\d*)x?(\d*)/.exec(dimensions);
-    if (!match) {
+    // Parse dimensions
+    const [, width = "", height = ""] = dimensions.match(/(\d*)x?(\d*)/) || [];
+    if (!width && !height) {
         exit("dimensions must be <width>x<height>");
     }
-    if (match[1]){
-        width = match[1];
+
+    log(`Converting to ${width} x ${height}`);
+
+    // Check source exists
+    try {
+        await fs.access(src);
+    } catch {
+        exit(`Cannot read ${src}`);
     }
-    if (match[2]){
-        height = match[2];
+
+    const targetDir = createDimensionDir ? path.join(dst, dimensions) : dst;
+
+    async function convert(srcPath, dstPath) {
+        try {
+            await quickthumb.convert({
+                src: srcPath,
+                dst: path.join(dstPath, path.basename(srcPath)),
+                width: parseInt(width) || undefined,
+                height: parseInt(height) || undefined,
+                type
+            });
+            log("CREATED", dstPath);
+        } catch (err) {
+            console.error(`Error processing ${srcPath}:`, err);
+        }
     }
-})();
 
-debug.log("Converting to " + width + " x " + height);
+    async function processDir(srcPath, dstPath) {
+        const files = await fs.readdir(srcPath);
 
+        await Promise.all(files.map(async (filename) => {
+            const sourcePath = path.join(srcPath, filename);
+            const stats = await fs.stat(sourcePath);
 
-if (!fs.existsSync(src)){
-    exit("Cannot read " + src);
-}
+            if (stats.isFile()) {
+                await convert(sourcePath, dstPath);
+            } else if (recursive && stats.isDirectory()) {
+                const targetPath = path.join(dstPath, filename);
+                await fs.mkdir(targetPath, { recursive: true });
+                await processDir(sourcePath, targetPath);
+            }
+        }));
+    }
 
-function convert(src, dst){
-    qt.convert({
-        src : src,
-        dst : path.join(dst, path.basename(src)),
-        width : width,
-        height : height,
-        type : type
-    }, function(err, image){
-        if (err){
-            return console.error(err);
+    try {
+        await fs.mkdir(targetDir, { recursive: true });
+        const stats = await fs.stat(src);
+
+        if (stats.isFile()) {
+            await convert(src, targetDir);
+        } else {
+            await processDir(src, targetDir);
         }
-        debug.log("CREATED", image);
-    });
+    } catch (err) {
+        console.error("Error:", err);
+        process.exit(1);
+    }
 }
 
-function processDir(src, dst){
-    fs.readdirSync(src).forEach(function(filename){
-        var spath = path.join(src, filename);
-        if (fs.statSync(spath).isFile()){
-            convert(spath, dst);
-        }
-        else if (recursive){
-            processDir(spath, path.join(dst, filename));
-        }
-    });
-}
-
-if (fs.statSync(src).isFile()){
-    convert(src, dst);
-}
-else{
-    processDir(src, dst);
-}
+main().catch(err => {
+    console.error("Fatal error:", err);
+    process.exit(1);
+});

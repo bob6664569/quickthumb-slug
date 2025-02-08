@@ -1,15 +1,49 @@
 # QuickThumb-Slug
 
-QuickThumb-Slug is an on the fly, thumbnail creation middleware for express based on the [QuickThumb lib](https://github.com/zivester/node-quickthumb) but using pre-defined sizes to avoid malicious exploitation of the library.
-It utilizes the popular *nix image library, ImageMagick. It allows for the automatic creation of thumbnails by adding a final slug to image filenames.
-It's ideal for web developers who would like to easily experiment with different size thumbnails, wihout having to worry about pre-generating an entire library.
+Fast and secure on-the-fly thumbnail generation middleware for Express, based on [QuickThumb](https://github.com/zivester/node-quickthumb). Uses pre-defined sizes to prevent malicious exploitation. Built with Sharp for optimal performance and memory efficiency.
 
-## Examples
+## Features
 
-```js
-var express = require('express'),
-    app = express(),
-    qt = require('quickthumb-slug');
+- On-demand thumbnail generation
+- Pre-defined size configurations for security
+- High-performance image processing with Sharp
+- Support for modern image formats (including WebP)
+- Compatible with Express and Connect
+- Simple slug-based URL format
+
+## Installation
+
+```bash
+npm install quickthumb-slug
+```
+
+## Usage
+
+### ESM (Recommended)
+
+```javascript
+import express from 'express';
+import quickthumb from 'quickthumb-slug';
+
+const app = express();
+
+app.use(quickthumb.static({
+    baseDir: new URL('.', import.meta.url).pathname + "/public",
+    sizes: {
+        square: { width: 400, height: 400, type: "crop" },
+        landscape: { width: 1200, height: 600, type: "crop" },
+        fitinportrait: { width: 400, height: 700, type: "resize" }
+    }
+}));
+```
+
+### CommonJS (Legacy)
+
+```javascript
+const express = require('express');
+const qt = require('quickthumb-slug');
+
+const app = express();
 
 app.use(qt.static({
     baseDir: __dirname + "/public",
@@ -19,52 +53,86 @@ app.use(qt.static({
         fitinportrait: { width: 400, height: 700, type: "resize" }
     }
 }));
-
 ```
+
+### Usage in HTML
 
 ```html
-<img src="/public/images/red-square.gif" />
+<!-- Original image -->
+<img src="/images/photo.jpg" />
+
+<!-- Thumbnailed version using 'square' configuration -->
+<img src="/images/photo-square.jpg" />
 ```
 
-## Install
+## Configuration
 
-    npm install quickthumb-slug
+The `static()` middleware accepts an options object with the following properties:
 
-ImageMagick is required for this module, so make sure it is installed.
+| Option | Type | Description | Default |
+|--------|------|-------------|---------|
+| `baseDir` | string | Source images directory | Required |
+| `cacheDir` | string | Generated thumbnails directory | `[baseDir]/.cache/` |
+| `sizes` | object | Size configurations (see below) | Default sizes |
+| `quality` | number | JPEG quality (0-100) | 80 |
 
-Ubuntu
+### Size Configuration
 
-    apt-get install imagemagick
+Each size configuration in the `sizes` object can have:
 
-Mac OS X
+- `width`: Width in pixels
+- `height`: Height in pixels
+- `type`: Processing type
+    - `"crop"` (default): Exact dimensions using center crop
+    - `"resize"`: Maintain aspect ratio, fit within dimensions
 
-    brew install imagemagick
+### Default Sizes
 
-Fedora/CentOS
+```javascript
+{
+    small: { width: 320, height: 9999, type: "crop" },
+    medium: { width: 768, height: 9999, type: "crop" },
+    large: { width: 1200, height: 9999, type: "crop" }
+}
+```
 
-    yum install imagemagick
+## File Naming
 
+Thumbnails are automatically generated based on the filename format:
+`[original-name]-[size-slug].[extension]`
 
-## Usage
+Examples:
+- Original: `photo.jpg`
+- Square thumbnail: `photo-square.jpg`
+- Landscape version: `photo-landscape.jpg`
 
-### qt.static(options)
+## Supported Formats
 
-Middleware to replace `express.static()` or `connect.static()`.
+- JPEG/JPG
+- PNG
+- GIF
+- WebP
 
-`options` is an object to specify customizations. It currently has the following options:
+## Caching
 
-* `baseDir` is the original directory where source images are located.
-* `cacheDir` The directory where generated images will be created.  If not supplied, images will be created in `[baseDir]/.cache/`
-* `sizes` Object containing configurations for image outputs, **properties are the slugs that will be used in filenames**
-    * `width` Width of resized image
-    * `height` Height of resized image
-    * `type` The type of imagemagick conversion to take place.  There are currently only two options:
-        * `crop` (default) Crops and zooms images to the exact size specified. Proxy to *imagemagick.crop*.
-        * `resize` Resizes an image to fit within the specified dimensions, but actual dimensions may not be exactly as specified. Proxy to *imagemagick.resize*.
-* `quality` The quality to use when resizing the image.  Values should be between 0 (worst quality) and 1 (best quality)
+Generated thumbnails are cached in `[cacheDir]/[type]/[slug]/`. The cache is automatically invalidated when the source image is modified.
 
-Resizing of images is directed by the image name.  This is in the format `[filename-without-ext]-[slug][original-ext]`. E.g. `red-square.gif`
+## Performance
 
-Resized images will be created on an as needed basis, and stored in `[cacheDir]/[slug]/[dim]`.
+This library uses Sharp for image processing, which provides:
+- 4-5x faster processing than ImageMagick
+- Lower memory usage
+- Better image quality
+- Native WebP support
 
-If the `slug` is not present, the original image will be served.
+## Migration from v1.x
+
+If you're upgrading from version 1.x:
+1. No code changes required - API remains compatible
+2. ImageMagick is no longer required
+3. Better memory management and performance
+4. Added WebP support
+
+## License
+
+MIT

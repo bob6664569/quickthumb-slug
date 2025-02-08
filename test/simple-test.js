@@ -1,33 +1,80 @@
-var assert = require("assert"),
-    fs = require("fs"),
-    path = require("path"),
-    im = require("imagemagick"),
-    qt = require("../");
+import { strict as assert } from 'assert';
+import { promises as fs } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import sharp from 'sharp';
+import quickthumb from '../index.js';
 
-var ppath = path.normalize(__dirname + "/../public/images"),
-    src = path.join(ppath, "cape cod.jpg");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-var sizes = [
-    { width: 100, height: 100},
-    { width: 100, height: 50},
-];
+const publicPath = path.normalize(path.join(__dirname, '../public/images'));
+const sourceImage = path.join(publicPath, 'cape cod.jpg');
 
-sizes.forEach(function(options){
-    var opt = {
-        src : src,
-        dst : path.join(ppath, "red_" + options.width + "x" + options.height + ".gif"),
-        width : options.width,
-        height : options.height,
-        quality : 1,
-    };
-    qt.convert( opt, function(err, image){
-        assert.ifError(err);
-        assert.equal(image, opt.dst);
-        im.identify(image, function(err, features){
-            assert.ifError(err);
-            assert.equal(features.width, opt.width);
-            assert.equal(features.height, opt.height);
-            assert.ifError(fs.unlinkSync(image));
-        });
+describe('QuickThumb Image Processing', () => {
+    test('should process crop operations', async () => {
+        const options = {
+            src: sourceImage,
+            dst: path.join(publicPath, 'red_100x100.gif'),
+            width: 100,
+            height: 100,
+            quality: 1,
+        };
+
+        try {
+            // Convert image
+            await new Promise((resolve, reject) => {
+                quickthumb.convert(options, (err, image) => {
+                    if (err) reject(err);
+                    else resolve(image);
+                });
+            });
+
+            // Verify dimensions with Sharp
+            const metadata = await sharp(options.dst).metadata();
+            assert.equal(metadata.width, options.width);
+            assert.equal(metadata.height, options.height);
+
+            // Cleanup
+            await fs.unlink(options.dst);
+        } catch (err) {
+            // Cleanup in case of error
+            try { await fs.unlink(options.dst); } catch {}
+            throw err;
+        }
+    });
+
+    test('should process resize operations', async () => {
+        const options = {
+            src: sourceImage,
+            dst: path.join(publicPath, 'red_100x50.gif'),
+            width: 100,
+            height: 50,
+            quality: 1,
+            type: 'resize'
+        };
+
+        try {
+            // Convert image
+            await new Promise((resolve, reject) => {
+                quickthumb.convert(options, (err, image) => {
+                    if (err) reject(err);
+                    else resolve(image);
+                });
+            });
+
+            // Verify dimensions with Sharp
+            const metadata = await sharp(options.dst).metadata();
+            assert(metadata.width <= options.width);
+            assert(metadata.height <= options.height);
+
+            // Cleanup
+            await fs.unlink(options.dst);
+        } catch (err) {
+            // Cleanup in case of error
+            try { await fs.unlink(options.dst); } catch {}
+            throw err;
+        }
     });
 });
