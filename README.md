@@ -69,12 +69,12 @@ app.use(qt.static({
 
 The `static()` middleware accepts an options object with the following properties:
 
-| Option | Type | Description | Default |
-|--------|------|-------------|---------|
-| `baseDir` | string | Source images directory | Required |
-| `cacheDir` | string | Generated thumbnails directory | `[baseDir]/.cache/` |
-| `sizes` | object | Size configurations (see below) | Default sizes |
-| `quality` | number | JPEG quality (0-100) | 80 |
+| Option | Type | Description | Default             |
+|--------|------|-------------|---------------------|
+| `baseDir` | string | Source images directory | Required            |
+| `cacheDir` | string | Generated thumbnails directory | `[baseDir]/thumbs/` |
+| `sizes` | object | Size configurations (see below) | Default sizes       |
+| `quality` | number | JPEG quality (0-100) | 80                  |
 
 ### Size Configuration
 

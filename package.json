@@ -1,6 +1,6 @@
 {
   "name": "quickthumb-slug",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Fast and secure on-the-fly thumbnail creation middleware for Express",
   "author": "Zach Ivester <zivester@gmail.com>",
   "contributors": [
